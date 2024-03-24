@@ -2,6 +2,92 @@
 
 **Діаграма прецедентів**
 
+## Загальна схема
+
+<center style="
+   border-radius:4px;
+   border: 1px solid #cfd7e6;
+   box-shadow: 0 1px 3px 0 rgba(89,105,129,.05), 0 1px 1px 0 rgba(0,0,0,.025);
+   padding: 1em;"
+>
+
+
+@startuml
+
+    actor "Клієнт" as Client
+    actor "Розробник" as Collaborator
+    actor "Тімлід" as Teamlead
+    actor "Адміністратор системи" as Admin
+
+    usecase "<b>SignUpAccount</b>\nЗареєструватися" as SignUpAccount
+    usecase "<b>LogInAccount</b>\nУвійти в систему" as LogInAccount
+    usecase "<b>EditAccount</b>\nРедагувати аккаунт" as EditAccount
+    usecase "<b>DeleteAccount</b>\nВидалити аккаунт" as DeleteAccount
+    usecase "<b>CreateTask</b>\nСтворити таску" as CreateTask
+    usecase "<b>DeleteTask</b>\nВидалити таску" as DeleteTask
+    usecase "<b>EditTask</b>\nРедагувати таску" as EditTask
+    usecase "<b>CreateProject</b>\nСтворити проєкт" as CreateProject
+    usecase "<b>EditProject</b>\nРедагувати проєкт" as EditProject
+    usecase "<b>DeleteProject</b>\nВидалити проєкт" as DeleteProject
+    usecase "<b>AddUserToProject</b>\nДодати користувача до проєкту" as AddUserToProject
+    usecase "<b>DeleteUserOfToProject</b>\nВидалити користувача з проєкту" as DeleteUserOfToProject
+    usecase "<b>BlockProject</b>\nЗаблокувати проєкт" as BlockProject
+    usecase "<b>UnblockProject</b>\nРозблокувати проєкт" as UnblockProject
+    usecase "<b>BanUser</b>\nЗабанити користувача" as BanUser
+    usecase "<b>UnbanUser</b>\nРозбанити користувача" as UnbanUser
+
+    Admin -u-|> Teamlead
+    Teamlead -u-|> Collaborator
+    Collaborator -u-|> Client
+
+    Client -u-> SignUpAccount
+    Client -d-> LogInAccount
+    Client -r-> EditAccount
+    Client -l-> DeleteAccount
+    Collaborator -u-> CreateTask
+    Collaborator -d-> DeleteTask
+    Collaborator -l-> EditTask
+    Teamlead -u-> CreateProject
+    Teamlead -d-> EditProject
+    Teamlead -l-> DeleteProject
+    Teamlead -r-> AddUserToProject
+    Teamlead -u-> DeleteUserOfToProject
+    Admin -u-> BlockProject
+    Admin -d-> UnblockProject
+    Admin -r-> BanUser
+    Admin -l-> UnbanUser
+
+@enduml
+
+## Тімлід
+
+<center style="
+   border-radius:4px;
+   border: 1px solid #cfd7e6;
+   box-shadow: 0 1px 3px 0 rgba(89,105,129,.05), 0 1px 1px 0 rgba(0,0,0,.025);
+   padding: 1em;"
+>
+
+
+@startuml
+
+    actor "Тімлід" as Teamlead
+
+    usecase "<b>CreateProject</b>\nСтворити проєкт" as CreateProject
+    usecase "<b>EditProject</b>\nРедагувати проєкт" as EditProject
+    usecase "<b>DeleteProject</b>\nВидалити проєкт" as DeleteProject
+    usecase "<b>AddUserToProject</b>\nДодати користувача до проєкту" as AddUserToProject
+    usecase "<b>DeleteUserOfToProject</b>\nВидалити користувача з проєкту" as DeleteUserOfToProject
+    
+    Teamlead -u-> CreateProject
+    Teamlead -d-> EditProject
+    Teamlead -l-> DeleteProject
+    Teamlead -r-> AddUserToProject
+    Teamlead -u-> DeleteUserOfToProject
+
+@enduml
+
+
 ## Звичайний користувач (User)
 
 <center style="
