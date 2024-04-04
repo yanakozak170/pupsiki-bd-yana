@@ -114,6 +114,13 @@ package TaskManage {
                id: int
                title: text
     }
+    entity Sprint {
+                id: int
+                title: text
+                description: text
+                deadline: timestamp
+                starttime: timestamp
+    }
 }
 
 package ReviewManage {
@@ -123,11 +130,26 @@ package ReviewManage {
     }
 }
 
+package ProjectManage {
+    entity Project {
+                id: int
+                title: text
+                status: enum
+                description: text
+
+    }
+}
+
+entity Team {
+}
+
 Task "1,1" -d-- "0,*" Tag
 Tag "0,*" -d-- "1,1" Label
 
 Review "0,*" -r-- "1,1" Task
-
+Sprint "0,*" -d-- "1,1" Task
+Sprint "0,*" -l-- "1,1" Project
+Project "1,1" -d-- "0,*" Team
 @enduml
 
 ## реляційна схема 
