@@ -98,4 +98,36 @@ Review "0, *"-l-"1, 1" Participant
 
 ## ER-модель
 
+@startuml
+
+package TaskManage {
+    entity Task  { 
+              id: int
+              title: text
+              status: text
+              description: text
+              deadline: timestamp
+    }
+    entity Tag {
+    }
+    entity Label {
+               id: int
+               title: text
+    }
+}
+
+package ReviewManage {
+    entity Review { 
+              id: int
+              title: text
+    }
+}
+
+Task "1,1" -d-- "0,*" Tag
+Tag "0,*" -d-- "1,1" Label
+
+Review "0,*" -r-- "1,1" Task
+
+@enduml
+
 ## реляційна схема 
