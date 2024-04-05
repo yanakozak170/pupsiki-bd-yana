@@ -185,4 +185,6 @@ User "0,*" -u-- "1,1" Participant
 
 @enduml
 
-## Реляційна схема 
+## Реляційна схема
+![relational_scheme](./relational_scheme.png)
+
