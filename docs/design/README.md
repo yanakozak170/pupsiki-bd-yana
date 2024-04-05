@@ -153,4 +153,4 @@ Project "1,1" -d-- "0,*" Team
 @enduml
 
 ## Реляційна схема
-![relational_scheme](./relation_scheme.png)
+![relational_scheme](./relational_scheme.png)
