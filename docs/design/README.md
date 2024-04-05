@@ -1,6 +1,6 @@
 # Проєктування бази даних
 
-## модель бізнес-об'єктів
+## Модель бізнес-об'єктів
 
 @startuml
 
@@ -140,7 +140,34 @@ package ProjectManage {
     }
 }
 
-entity Team {
+package Team {
+    entity Participant {
+        id: int
+        role: enum
+    }
+}
+
+entity User {
+    id: int
+    login: text
+    password: text
+    mail: text
+    name: text
+    roleID: int
+    orgListID: int
+}
+
+entity Role {
+    id: int
+    name: text
+    description: text
+}
+
+package Grant {
+    entity Permission {
+        id: int
+        name: text
+    }
 }
 
 Task "1,1" -d-- "0,*" Tag
@@ -150,6 +177,12 @@ Review "0,*" -r-- "1,1" Task
 Sprint "0,*" -d-- "1,1" Task
 Sprint "0,*" -l-- "1,1" Project
 Project "1,1" -d-- "0,*" Team
+
+Team "0,*" -u-- "1,1" Project
+Grant "0,*" -r-- "1,1" Role
+User "1.1" -d-- "0.*" Permission
+User "0,*" -u-- "1,1" Participant 
+
 @enduml
 
-## реляційна схема 
+## Реляційна схема 
