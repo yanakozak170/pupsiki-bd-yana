@@ -71,9 +71,9 @@ Sprint.description -d-* Sprint
 Sprint.starttime -d-* Sprint 
 Sprint.deadline -l-* Sprint 
 
-Label.title -l-* Label
+Label.title -u-* Label
 
-Review.title -l-* Review
+Review.title -u-* Review
 
 Task.title -l-* Task
 Task.description -l-* Task
@@ -88,7 +88,7 @@ Team "1, 1"-d-"0, *" Participant
 Project "1, 1"-d-"0, *" Team
 Sprint "0, *"-l-"1, 1" Project
 Task "0, *"-u-"1, 1" Sprint
-
+Review "0, 1"-u-"0, *" Review
 Label "1, 1"-u-"0, *" Tag
 Tag "0, *"-u-"1, 1" Task
 Review "0, *"-u-"1, 1" Task
