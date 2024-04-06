@@ -147,7 +147,8 @@ package Team {
     }
 }
 
-entity User {
+package AccountManage{
+    entity User {
     id: int
     login: text
     password: text
@@ -156,6 +157,8 @@ entity User {
     roleID: int
     orgListID: int
 }
+}
+
 package AccessControl {
     entity Role {
         id: int
