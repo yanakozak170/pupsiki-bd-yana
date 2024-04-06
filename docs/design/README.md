@@ -156,17 +156,19 @@ entity User {
     roleID: int
     orgListID: int
 }
+package AccessControl {
+    entity Role {
+        id: int
+        name: text
+        description: text
+    }
 
-entity Role {
-    id: int
-    name: text
-    description: text
-}
-
-package Grant {
     entity Permission {
         id: int
         name: text
+    }
+
+    entity Grant {  
     }
 }
 
@@ -178,10 +180,10 @@ Sprint "0,*" -d-- "1,1" Task
 Sprint "0,*" -l-- "1,1" Project
 Project "1,1" -d-- "0,*" Team
 
-Team "0,*" -u-- "1,1" Project
-Grant "0,*" -r-- "1,1" Role
 User "1.1" -d-- "0.*" Permission
 User "0,*" -u-- "1,1" Participant 
+Grant "0,*" -r-> "1,1" Role
+Grant "0,*" -l-> "1,1" Permission
 
 @enduml
 
