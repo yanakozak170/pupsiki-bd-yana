@@ -179,7 +179,7 @@ Task "1,1" -d-- "0,*" Tag
 Tag "0,*" -d-- "1,1" Label
 
 Review "0,*" -r-- "1,1" Task
-Sprint "0,*" -d-- "1,1" Task
+Sprint "1,1" -d-- "0,*" Task
 Sprint "0,*" -l-- "1,1" Project
 Project "1,1" -d-- "0,*" Team
 
