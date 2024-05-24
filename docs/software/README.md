@@ -446,4 +446,175 @@ INSERT INTO `pupsiki`.`tag` (`id`, `label_id`, `task_id`) VALUES (5, 3, 1);
 COMMIT;
 ```
 
-- RESTfull сервіс для управління даними
+## RESTfull сервіс для управління даними
+
+app.py:
+```python
+from flask import Flask
+
+app = Flask(__name__);
+
+from users_controller import *
+```
+
+users_controller.py:
+```python
+from app import app
+from users_model import Users
+from flask import request, jsonify
+
+users = Users()
+
+@app.route("/users")
+def get_all_users():
+    result = users.get_all_users()
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/<id>")
+def get_user_by_id(id):
+    result = users.get_user_by_id(id)
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/add", methods=["POST"])
+def add_user():
+    result = users.add_user(request.form)
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/update", methods=["PATCH"])
+def update_user():
+    result = users.update_user(request.form)
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/delete/<id>", methods=["DELETE"])
+def delete_user(id):
+    result = users.delete_user(id)
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/ban/<id>", methods=["PATCH"])
+def ban_user(id):
+    result = users.ban_user(id)
+    return jsonify(result), result.get('status_code', 200)
+
+@app.route("/user/unban/<id>", methods=["PATCH"])
+def unban_user(id):
+    result = users.unban_user(id)
+    return jsonify(result), result.get('status_code', 200)
+```
+
+users_models.py:
+```python
+import json
+import mysql.connector
+
+class Users:
+    def __init__(self):
+        try:
+            self.con = mysql.connector.connect(host="localhost", user="root", passwd="A1b3c29f7", database="pupsiki")
+            print("Successfully connected to the database!")
+            self.cur = self.con.cursor(dictionary=True)
+        except mysql.connector.Error as e:
+            print("Failed to connect to the database:", str(e))
+
+    def get_all_users(self):
+        try:
+            self.cur.execute("SELECT * FROM user")
+            result = self.cur.fetchall()
+            if self.cur.rowcount == 0:
+                return {"message": "There are no users", "error": "Not Found", "status_code": 404}
+            return {"data": result, "status_code": 200}
+        except mysql.connector.Error as e:
+            return {"message": str(e), "error": "Database Error", "status_code": 500}
+
+    def get_user_by_id(self, id):
+        if not str(id).isdigit():
+            return {"message": "Invalid user id", "error": "Bad Request", "status_code": 400}
+        try:
+            self.cur.execute("SELECT * FROM user WHERE id = %s", (id,))
+            result = self.cur.fetchall()
+            if self.cur.rowcount == 0:
+                return {"message": "There is no user with such id", "error": "Not Found", "status_code": 404}
+            return {"data": result, "status_code": 200}
+        except mysql.connector.Error as e:
+            return {"message": str(e), "error": "Database Error", "status_code": 500}
+
+    def add_user(self, data):
+        data = dict(data)
+        required_keys = {'id', 'username', 'email', 'password', 'isBanned'}
+        if not required_keys.issubset(data):
+            return {"message": "Invalid or missing keys", "error": "Bad Request", "status_code": 400}
+        try:
+            query = "INSERT INTO user (Id, Username, Email, Password, IsBanned) VALUES (%s, %s, %s, %s, %s)"
+            values = (data['id'], data['username'], data['email'], data['password'], data['isBanned'])
+            self.cur.execute(query, values)
+            self.con.commit()
+            if self.cur.rowcount > 0:
+                return {"message": "Successfully added to database", "status_code": 200}
+            else:
+                return {"message": "User was not added to database", "error": "Not Acceptable", "status_code": 406}
+        except mysql.connector.Error as e:
+            self.con.rollback()
+            return {"message": "Failed to add user: " + str(e), "error": "Database Error", "status_code": 500}
+
+
+    def update_user(self, data):
+        data = dict(data)
+        if 'id' not in data:
+            return {"message": "Missing user id", "error": "Bad Request", "status_code": 400}
+        user_id = data['id']
+        del data['id']
+        if not data:
+            return {"message": "No data provided to update", "error": "Bad Request", "status_code": 400}
+        set_clause = ', '.join([f"{key} = %s" for key in data])
+        values = list(data.values())
+        values.append(user_id)
+        try:
+            query = f"UPDATE user SET {set_clause} WHERE Id = %s"
+            self.cur.execute(query, values)
+            self.con.commit()
+
+            if self.cur.rowcount > 0:
+                return {"message": "Successfully updated user", "status_code": 200}
+            else:
+                return {"message": "No changes made to user", "error": "Not Found", "status_code": 404}
+        except mysql.connector.Error as e:
+            self.con.rollback()
+            return {"message": "Failed to update user: " + str(e), "error": "Database Error", "status_code": 500}
+
+    def delete_user(self, id):
+        if not str(id).isdigit():
+            return {"message": "Invalid user id", "error": "Bad Request", "status_code": 400}
+        try:
+            self.cur.execute("DELETE FROM user WHERE Id = %s", (id,))
+            self.con.commit()
+
+            if self.cur.rowcount > 0:
+                return {"message": "User was successfully deleted", "status_code": 200}
+            else:
+                return {"message": "Nothing to delete", "error": "Not Found", "status_code": 404}
+        except Exception as e:
+            self.con.rollback()
+            return {"message": "Failed to delete user", "error": str(e), "status_code": 500}
+
+    def ban_user(self, id):
+        return self._update_ban_status(id, True)
+
+    def unban_user(self, id):
+        return self._update_ban_status(id, False)
+
+    def _update_ban_status(self, id, ban_status):
+        if not str(id).isdigit():
+            return {"message": "Invalid user id", "error": "Bad Request", "status_code": 400}
+        try:
+            query = "UPDATE user SET IsBanned = %s WHERE Id = %s"
+            self.cur.execute(query, (ban_status, id))
+            self.con.commit()
+
+            if self.cur.rowcount > 0:
+                action = "banned" if ban_status else "unbanned"
+                return {"message": f"User was successfully {action}", "status_code": 200}
+            else:
+                return {"message": "No user found with the given id", "error": "Not Found", "status_code": 404}
+        except mysql.connector.Error as e:
+            self.con.rollback()
+            return {"message": f"Failed to update ban status: {str(e)}", "error": "Database Error", "status_code": 500}
+```
